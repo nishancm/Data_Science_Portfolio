@@ -1,0 +1,178 @@
+---
+title: "Jet Blue reach to the top"
+author: "Nishan Madawanarachchi"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data
+The data provided are the domestic market data reported for US carriers by Bureau of Transportation Statistics; availble [*here*](https://www.transtats.bts.gov/DatabaseInfo.asp?DB_ID=111). We got 28 csv files representing market data from 1990 to 2017.
+
+```{r, warning=F, message=F}
+# loading the required librarys
+library(magrittr)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+```
+
+```{r, cache=T}
+#Getting the CSV files except 2017 data as it is not completed
+flights <- data.frame(NULL)
+for(i in 1990:2016) {  
+    file <- paste0("657240010_T_T100D_MARKET_US_CARRIER_ONLY_",i,"_All.csv")
+    flights <- rbind(flights, read.csv(paste0("q3_data/",file)) )
+}
+```
+
+```{r}
+str(flights)
+```
+
+Dataframe `flights` has `r nrow(flights)` rows and `r ncol(flights)` variables.
+
+## Cleaning up data for unwanted columns
+```{r, cache=T}
+cols <- c("YEAR", "MONTH", "PASSENGERS", "FREIGHT", "MAIL", "CARRIER_GROUP_NEW", "UNIQUE_CARRIER_NAME")
+flights2 <- flights[cols]
+kable(head(flights2))
+```
+
+## Lets first see how enplanned number of passengers grew over the years
+
+```{r,cache=T}
+# making year a factor
+flights2$YEAR <- as.factor(flights2$YEAR)
+
+# summing enplaned passengers, freight and mail per year basis
+byyear_pfm <- flights2 %>% group_by(YEAR) %>% 
+    summarise(PASSENGERS = sum(PASSENGERS,na.rm = T), FREIGHT = sum(FREIGHT, na.rm = T), 
+              MAIL = sum(MAIL, na.rm = T))
+kable(head(flights2))
+```
+
+```{r, cache=T, fig.height=2, fig.width= 4}
+# plot enplanned passenger growth
+ggplot(byyear_pfm, aes(x = YEAR, y = PASSENGERS, group = 1)) + geom_line() + 
+    theme(text = element_text(size=10),axis.text.x = element_text(angle=90))
+```
+
+Enplaned number of passengers has steadily grown over the years from 1990 to 2016.
+However, there are decrease in the number of passengers in the period 2000-2002 as 
+well as in the period 2007-2009.
+
+## Lets see the mix of the carrier groups interms of number of passengers in 2016
+
+```{r, cache=T}
+# making CARRIER_GROUP_NEW a factor variable
+flights2$CARRIER_GROUP_NEW <- as.factor(flights2$CARRIER_GROUP_NEW)
+# looking at 2016 carrier group mix
+carriergrp_2016 <- flights2 %>% filter(YEAR == 2016, PASSENGERS > 0) %>% 
+    group_by(CARRIER_GROUP_NEW) %>% summarise(PASSENGERS = sum(PASSENGERS,na.rm = T))
+```
+
+```{r, cache=T}
+carriergrp_2016 %<>% mutate(Share = round(PASSENGERS*100/sum(PASSENGERS), 2) )
+kable(carriergrp_2016)
+```
+
+From the table above it can be seen that Major Carriers (3) has highest share (88.16%) 
+of enplanned passengers. Well behind major carriers are the national carriers (2) with a
+share of (10.14%)
+
+## Lets see how the percentage share between Major and national carriers changed over the years
+
+```{r, cache = T}
+carriergrp <- flights2 %>% filter(CARRIER_GROUP_NEW == 2 | CARRIER_GROUP_NEW == 3, 
+                                       PASSENGERS > 0) %>% 
+    group_by(YEAR, CARRIER_GROUP_NEW) %>% summarise(PASSENGERS = sum(PASSENGERS,na.rm = T))
+```
+
+```{r, cache=T, fig.height=3, fig.width= 6}
+# calculating share between national carriers and major carriers
+carriergrp %<>% mutate(share = round(PASSENGERS*100/sum(PASSENGERS), 2) )
+ggplot(carriergrp, aes(x = YEAR, y = share, col = CARRIER_GROUP_NEW, group = 1)) + 
+    geom_point( ) + theme(text = element_text(size=10),axis.text.x = element_text(angle=90))
+
+# maximum passenger share of national carriers
+maxshare <- max(filter(carriergrp, CARRIER_GROUP_NEW==2)$share)
+```
+
+It can be the seen from the graph above that national carriers were making ground
+interms of passenger share in the period 1990 to 2004, where it reach the maximum
+passenger share of `r maxshare` compared to major carriers. Afterwards the share 
+of national carriers hits a downward trend. However, it can be assumed that during 
+the period 2004-2008 some of the national carriers were perfoming well interms of 
+revenue and reclassifed as major carriers.
+
+## Lets check for years where national carriers were reclassifed as major carriers
+
+```{r, cache = T}
+# data frame of national and major carriers
+natMajflights <- flights2 %>% select(YEAR, MONTH, UNIQUE_CARRIER_NAME, 
+                                     CARRIER_GROUP_NEW) %>%
+    filter(CARRIER_GROUP_NEW == 2 | CARRIER_GROUP_NEW == 3, MONTH == 1)
+```
+
+```{r, cache=T}
+# table with unqiue group and carrier values
+natMajflights2 <- natMajflights %>% select(UNIQUE_CARRIER_NAME, CARRIER_GROUP_NEW) %>%
+    distinct()
+```
+
+```{r, chache=T}
+# changed list carriers
+changedlist <- natMajflights2[duplicated(natMajflights2$UNIQUE_CARRIER_NAME), ]
+# we are only interested in 2 to 3
+changedlist <- as.character(changedlist[changedlist$CARRIER_GROUP_NEW == 3,1])
+```
+
+```{r, chache=T}
+#reducing natMajflights to only group 3 carriers
+natMajflights <- dplyr::filter(natMajflights, CARRIER_GROUP_NEW == 3)
+indices <- match(changedlist, natMajflights$UNIQUE_CARRIER_NAME)
+```
+
+```{r}
+# Table of years when recalssification happened
+kable(data.frame(Carrier = changedlist, year = natMajflights$YEAR[indices] ))
+```
+
+It is clearly visible from the above table that 9 out of the national carriers 
+were reclassified as Major carriers during the period 2004-2008 indicating strong 
+growth in these carriers.
+
+## Lets see the most popular Major carriers among the passengers in last 5 years
+
+I am assuming the most popular carriers are the ones with highest enplaned passengers
+```{r, cache=T}
+# sum of passengers by carrier
+top5 <- flights2 %>% dplyr::filter(YEAR == 2012 | YEAR == 2013 |YEAR == 2014 |
+                                       YEAR == 2015 | YEAR == 2016) %>% 
+    group_by(YEAR, UNIQUE_CARRIER_NAME) %>% summarise(PASSENGERS = sum(PASSENGERS)) %>%
+    ungroup %>% arrange(YEAR, desc(PASSENGERS))
+```
+
+```{r, cache = T}
+top5_ref <- list()
+j=1
+for(i in 2012:2016) {
+    temp <- dplyr::filter(top5, YEAR == i)[1:5,2]
+    top5_ref[[j]] <- temp
+    j <- j + 1
+}
+```
+
+```{r, cache = T}
+top5_ref <- as.data.frame(top5_ref)
+colnames(top5_ref) <- c("2012","2013","2014","2015","2016")
+kable(top5_ref[,1:3])
+kable(top5_ref[,4:5])
+```
+
+It can be seen from the tables above that jet blue airways had made giant strides in
+securing a top 5 spot in 2015 and 2016 (since becoming classified as major airline in 
+2005) surpassing US Airways Inc. 
