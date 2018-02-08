@@ -1,0 +1,243 @@
+---
+title: "Does race affect the result of traffic stops"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Data
+
+This dataset contains yearly traffic stops information provided by Charlotte-Mecklenburg Police Department(CMPD)  available [*here*](https://catalog.data.gov/dataset/officer-traffic-stops).
+
+
+```{r, warning=F, message=F}
+# Loading libraries needed
+library(tidyverse)
+library(knitr)
+library(magrittr)
+```
+
+Loading the the `Officer_Traffic_Stops.csv` data
+```{r, cache=T}
+trfic_stps <- read.csv("Officer_Traffic_Stops.csv")
+
+# taking unwanted columns out
+trfic_stps <- trfic_stps[, !names(trfic_stps) %in% 
+                             c("ObjectID", "CreationDate", "Creator", "EditDate",
+                               "Editor")]
+```
+
+```{r}
+str(trfic_stps)
+```
+
+Dataframe `trfic_stps` has `r nrow(trfic_stps)` rows and `r ncol(trfic_stps)` variables.
+
+## Lets see the reason for stopping vehicles by CMPD in year 2016
+```{r, cache=T}
+# count of reasons
+stops <- as.data.frame(table(trfic_stps$Reason_for_Stop))
+top3rsns <- as.character(arrange(stops, desc(Freq))$Var1[1:3])
+```
+
+
+```{r, cache=T}
+# bar plot of reasons
+stops %>% ggplot(aes(x = reorder(Var1, desc(Freq)), y = Freq)) +
+    geom_bar(stat = "Identity") + 
+    theme(axis.text.x = element_text(angle=45, size = 8)) + xlab("Reason")
+```
+
+It can be seen from the above plot that main 3 causes for vehicle stoppping by CPMD is
+due to violations in vehicle registration, speeding and Stop light/sign. 
+
+## Lets understand actions taken by CMPD for each of reason of stopping.
+
+We will focus on top 3 actions taken by CMPD for each stopping event
+```{r, cache=T}
+# table with reason and result
+consistncy <- as.data.frame(table(trfic_stps$Reason_for_Stop, 
+                                  trfic_stps$Result_of_Stop))
+# taking only first 3 results
+consistncy %<>% group_by(Var1) %>% mutate(prop = Freq/sum(Freq)) %>% 
+    arrange(Var1, desc(Freq)) %>% slice(1:3)
+```
+
+```{r}
+# top 3 actions
+top3rsn_rslt <- c(0,0,0)
+for(i in 1:3)
+    top3rsn_rslt[i] <- filter(consistncy, Var1 == top3rsns[i])[1,2]
+top3rsn_rslt <- as.character(unlist(top3rsn_rslt))
+```
+
+```{r, cache=T}
+ggplot(consistncy, aes(x = Var1, y = prop, fill = Var2)) + 
+    geom_bar(stat = "Identity") + 
+    theme(text = element_text(size=10),axis.text.x = element_text(angle=90)) +
+    ylab("Propotion") + xlab("Reason") + 
+    scale_fill_discrete(name = "Action taken") + 
+    theme(axis.text.x = element_text(angle=45, size = 8)) 
+```
+
+Looking at the graph above it seems that there are quite bit variation in the action taken by CPMD. Still it can argued that action taken depends on the situation. Therefore it is worth looking at the profile of the driver.
+
+However, before moving forward I am going to assume that CMPD take following actions  
+regarding top 3 traffic violations in general. This will be the baseline.
+
+```{r, cache=T}
+kable(data.frame(Reson = top3rsns, General_result = top3rsn_rslt),caption = 'General action taken for top 3 stopping events')
+```
+
+## Lets see whether driver profile (Race, Gender, Age) had any impact on the action taken by CPMD
+
+```{r, cache=T}
+# filter out the data for only top3 reasons
+# create variable to identify consistent (0), and inconsisten (1) actions
+
+new_trfic_stps <- trfic_stps %>% filter(Reason_for_Stop %in% top3rsns) %>%
+    mutate(consistent = ifelse( (
+        (Reason_for_Stop == top3rsns[1] & Result_of_Stop == top3rsn_rslt[1])|
+        (Reason_for_Stop == top3rsns[2] & Result_of_Stop == top3rsn_rslt[2])|
+        (Reason_for_Stop == top3rsns[3] & Result_of_Stop == top3rsn_rslt[3])
+        ), yes = 0, no = 1))
+```
+
+```{r, cache=T}
+# general rate being consistent
+consisrate <- mean(new_trfic_stps$consistent == 0)
+
+# for gender
+consisrate_gender <- new_trfic_stps %>% group_by(Driver_Gender) %>% 
+    summarise(rate = mean(consistent == 0))
+
+tdf1 <- data.frame(Variable = rep("Gender", nrow(consisrate_gender)), 
+                   Value = unlist(consisrate_gender[,2]), 
+                          Profile = unlist(consisrate_gender[,1]))
+
+# for Driver_Race
+consisrate_race <- new_trfic_stps %>% group_by(Driver_Race) %>% 
+    summarise(rate = mean(consistent == 0))
+
+tdf2 <- data.frame(Variable = rep("Race", nrow(consisrate_race)), 
+                   Value = unlist(consisrate_race[,2]), 
+                          Profile = unlist(consisrate_race[,1]))
+
+# creating gender groups
+new_trfic_stps <- cbind(new_trfic_stps, Age_group = 
+                        cut(new_trfic_stps$Driver_Age, 
+                            breaks =  c(0, 18, 55, 200), 
+                            labels = c("Junior", "Mid Age", "Senior"), 
+                            right = F))
+
+consisrate_age <- new_trfic_stps %>% group_by(Age_group) %>% 
+    summarise(rate = mean(consistent == 0))
+
+tdf3 <- data.frame(Variable = rep("Age_group", nrow(consisrate_age)), 
+                   Value = unlist(consisrate_age[,2]), 
+                          Profile = unlist(consisrate_age[,1]) )
+
+# driver profiles
+drivr_prof <- rbind(tdf1, tdf2, tdf3)
+```
+
+On top 3 traffic violations `r round(consisrate,2)*100`% of the time, action taken by CMPD is consistent with the general actions pointed out in `Table 1`. Now we are going to see how this consistentancy is affected with different driver profiles. So for e.g. if the calculated value is greater than `r round(consisrate,2)`, this means CMPD is more likely to take the general action for this particular driver group. **This will be identified as a consistent behavior**. And if the calculated value is less than `r round(consisrate,2)`, this means CMPD is compartively less likely to take the general action for this particular driver group. **This will be identified as a inconsistent behavior**
+
+```{r, cache=T}
+# plot by driver profile
+ggplot(drivr_prof, aes(x = Variable, y = Value, group = 1, col = Profile)) + 
+    geom_point() + geom_hline(aes(yintercept = consisrate, 
+                                  col = "overall consistency rate"), 
+                              size=0.25, type = "b") 
+    
+```
+
+It is visible from the above plot that actions taken by CMPD is more or less consistent for the gender of a driver. Relative to overall consistency rate, it seems that CMPD has been less 
+consistent on races of white and native americans, where as they are more consistent
+on Asian and Black races. Also, relative to overall consistency rate, it seems that CMPD is more consistent on juniors where as they are less consistent on seniors. It will be interesting to know where these inconsistancies are leaning towards, i.e. whether CPMD being strict or lenient towrds these groups.    
+
+On the other hand tt will be interesting look at profile of police officers to see whether it had a
+part to play in CMPD being less or more consistent.
+
+## Lets see whether how actions taken varies with the race of the driver and the profile of the police officer
+
+Profile of the police offcier is provided using attibutes such as race, gender, years of service of the police officer.
+
+```{r, cache=T}
+# Race distibution of the driver
+kable(count(x = new_trfic_stps, Driver_Race))
+```
+
+Table above shows the race distribution of the drivers. White and Black are the larger 
+majority. Hence we will focus whether reltively higher consistency towards race of black we saw previously
+has anything to do with the profile of the police officer.
+
+```{r, cache=T}
+# filter only for black
+new_trfic_stps_B <- filter(new_trfic_stps, Driver_Race == "Black")
+```
+
+```{r,cache=T}
+# overall consistency rate for black
+consisrate_B <- mean(new_trfic_stps_B$consistent == 0)
+
+# by gender
+consisrate_B_gender <- new_trfic_stps_B %>% group_by(Officer_Gender) %>% 
+    summarise(rate = mean(consistent == 0))
+
+tdf4 <- data.frame(Variable = rep("Gender", nrow(consisrate_B_gender)), 
+                   Value = unlist(consisrate_B_gender[,2]), 
+                          Profile = unlist(consisrate_B_gender[,1]))
+
+# by race
+lvls <- as.character(levels(new_trfic_stps_B$Officer_Race)[2:8])
+consisrate_B_race <- new_trfic_stps_B %>% filter(Officer_Race %in% lvls) %>%
+    group_by(Officer_Race) %>% 
+    summarise(rate = mean(consistent == 0))
+
+
+tdf5 <- data.frame(Variable = rep("Race", nrow(consisrate_B_race)), 
+                   Value = unlist(consisrate_B_race[,2]), 
+                          Profile = unlist(consisrate_B_race[,1]))
+
+# by years of service
+new_trfic_stps_B <- cbind(new_trfic_stps_B, Service_group = 
+                        cut(new_trfic_stps_B$Officer_Years_of_Service, 
+                            breaks =  c(0, 3, 10, 100), 
+                            labels = c("Newbie", "Mid carreer", "Experienced")))
+
+consisrate_B_yos <- new_trfic_stps_B %>% group_by(Service_group) %>% 
+    summarise(rate = mean(consistent == 0))
+
+tdf6 <- data.frame(Variable = rep("Service_group", nrow(consisrate_B_yos)), 
+                   Value = unlist(consisrate_B_yos[,2]), 
+                          Profile = unlist(consisrate_B_yos[,1]) )
+
+# officer profiles
+offcr_prof <- rbind(tdf4, tdf5, tdf6)
+```
+
+On overall consistency rate shown by CMPD is towards race of black is 
+`r round(consisrate_B,2)`.
+
+```{r, cache=T}
+# plot by officer profile
+offcr_prof$Profile <- as.character(offcr_prof$Profile)
+
+ggplot(offcr_prof, aes(x = Variable, y = Value, group = 1, col = Profile)) + 
+    geom_point() + geom_hline(aes(yintercept = consisrate, 
+                                  col = "overall consistency rate"), 
+                              size=0.25, type = "b") + 
+    geom_hline(aes(yintercept = consisrate_B, 
+                                  col = "overall consistency rate (Black)"), 
+                              size=0.25, type = "b")
+
+```
+
+Graph above indicate that female police officers tend to be less consistent in their
+action towards race of black. It can be seen that police officer with races from Native Hawaiian/Oth Pac Island, and American Indian/Alaska Native show more consistency towards race of black, whereas Hispanic/Latino police officers show less consistent approach. Also it can be seen that police officers who are new, shows more consistency towards race of black, where as experienced police officers have a less consistent approach. As pointed out previously it will interesting to look at where these inconsistancies are leaning towards, i.e. whether police offciers being strict or lenient towrds black groups.
+
+
+
