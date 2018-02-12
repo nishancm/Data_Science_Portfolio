@@ -7,14 +7,14 @@ In this project we are using results from the [Stanford GLoVE](https://nlp.stanf
 Program offers user two options. If the user provides word in the prompt, program will return n closest words matching the word entered.
 ```
 Enter a word or 'x:y as z:'
-> Brain
-Brain is similar to {dogs cat pet puppy hound}
+> student
+student is similar to {students teacher graduate campus undergraduate}}
 ```
 If the user provide an analogy and a word, program will return a word matching the analogy provided by the user.
 ```
 Enter a word or 'x:y as z:'
 > teacher:school as doctor:
-teacher is to school as doctor is to {woman girl person teenager she}
+teacher is to school as doctor is to {medical school doctors hospital clinic}
 ```
 
 # the data
@@ -28,4 +28,4 @@ sandberger 0.429191 -0.296897 0.15011 0.245201 ...
 ```
 python wordsim.py <path to 300d glove file>
 ```
-users can kill the program by pressing `control-c`
+User will be iterative prompt for words and analogies in the command line. Users can kill the program by pressing `control-c`
