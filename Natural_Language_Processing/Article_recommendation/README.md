@@ -4,7 +4,7 @@ This project will host a webserver in AWS to display a list of [bbc](http://mlg.
 
 # Finding similar articles
 
-For each article, article centroid is derived by taking the mean of word vectors available from [Stanfor Glove project](https://nlp.stanford.edu/projects/glove/). Then for each article euclidean distance to all other articles are calculated. Articles with minimum euclidean distance to a particlar article will be identified as similar articles.
+For each article, article centroid is derived by taking the mean of word vectors available from [Stanford Glove project](https://nlp.stanford.edu/projects/glove/). Then for each article euclidean distance to all other articles are calculated. Articles with minimum euclidean distance to a particlar article will be identified as similar articles.
 
 # Running the app
 
