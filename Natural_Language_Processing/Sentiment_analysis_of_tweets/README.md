@@ -1,31 +1,12 @@
 # Introduction
 
-This project use results from the [Stanford GLoVE](https://nlp.stanford.edu/projects/glove/) project. In simple terms GloVe provides a vector representation of the words (e.g. 300 dimension space). And this vector representation of the words can be used identify relationships between the words.
-
-# The project
-
-Program offers user two options. If the user provides word in the prompt, program will return n closest words matching the word entered.
-```
-Enter a word or 'x:y as z:'
-> student
-student is similar to {students teacher graduate campus undergraduate}}
-```
-If the user provide an analogy and a word, program will return a word matching the analogy provided by the user.
-```
-Enter a word or 'x:y as z:'
-> teacher:school as doctor:
-teacher is to school as doctor is to {medical school doctors hospital clinic}
-```
-
-# the data
-
-File containing 300 dimension representation of words are downloaded from [Stanford GLoVE](https://nlp.stanford.edu/projects/glove/). And sample lines of the looks like this.
-```
-sandberger 0.429191 -0.296897 0.15011 0.245201 ... 
-```
+This project will host a webserver in AWS to display,
+* Top 100 tweets of a twitter user with a color gradient to represent thier sentiment (red - post). This can be accessed by  ```<URL of AWS instance>/<screen name of the user>```
+* Followers of a user sorted in descending order by the number of followers of them. This can be accessed by ```<URL of AWS instance>/following/<screen name of the user>```
 
 # Running the app
+
+In login to AWS instance and clone the folder with files. Then install `flask, tweepy, gunicorn, vaderSentiment, colour` python libraries. Then run the application using,
 ```
-python wordsim.py <path to 300d glove file>
+gunicorn -D --threads 4 -b 0.0.0.0:5000 --access-logfile server.log server:app <path to twitter key file>
 ```
-User will be iterative prompt for words and analogies in the command line. Users can kill the program by pressing `control-c`
