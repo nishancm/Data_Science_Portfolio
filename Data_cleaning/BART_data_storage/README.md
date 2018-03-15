@@ -1,28 +1,8 @@
 # Introduction
 
-In this project we are using results from the [Stanford GLoVE](https://nlp.stanford.edu/projects/glove/) project. In simple terms GloVe provides a vector representation of the words (e.g. 300 dimension space). And this vector representation of the words can be used identify relationships between the words.
+This python script helps to load BART data avaiable [here](https://www.bart.gov/about/reports/ridership) in to a local PostgreSQL database. Script will perform following tasks
 
-# The project
-
-Program offers user two options. If the user provides word in the prompt, program will return n closest words matching the word entered.
-```
-Enter a word or 'x:y as z:'
-> student
-student is similar to {students teacher graduate campus undergraduate}}
-```
-If the user provide an analogy and a word, program will return a word matching the analogy provided by the user.
-```
-Enter a word or 'x:y as z:'
-> teacher:school as doctor:
-teacher is to school as doctor is to {medical school doctors hospital clinic}
-```
-
-# the data
-
-File containing 300 dimension representation of words are downloaded from [Stanford GLoVE](https://nlp.stanford.edu/projects/glove/). And sample lines of the looks like this.
-```
-sandberger 0.429191 -0.296897 0.15011 0.245201 ... 
-```
+* extract the downloaded BART zip files
 
 # Running the app
 ```
