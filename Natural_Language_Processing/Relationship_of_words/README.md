@@ -1,6 +1,6 @@
 # Introduction
 
-In this project we are using results from the [Stanford GLoVE](https://nlp.stanford.edu/projects/glove/) project. In simple terms GloVe provides a vector representation of the words (e.g. 300 dimension space). And this vector representation of the words can be used identify relationships between the words.
+This project use results from the [Stanford GLoVE](https://nlp.stanford.edu/projects/glove/) project. In simple terms GloVe provides a vector representation of the words (e.g. 300 dimension space). And this vector representation of the words can be used identify relationships between the words.
 
 # The project
 
