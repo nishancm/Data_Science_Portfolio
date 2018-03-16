@@ -1,0 +1,76 @@
+// school colors:
+$green: #05543D;
+$yellow: #FEC23B;
+
+@mixin vertical-align($position: relative) {
+  position: $position;
+  top: 50%;
+  display:block;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+a{
+  text-decoration:none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+html{
+  font-family: "Neue-helvetica", helvetica, sans-serif;
+
+}
+
+#main{
+
+
+  #banner {
+    width: 100%;
+    display:block;
+    background: $green;
+    color: white;
+    position:relative;
+    line-height: 0;
+  
+
+    #logo{
+      display:inline-block;
+      padding:10px;
+    }
+    #logo a{
+      height: 50px;
+      width:50px;
+      display:block;
+      background-image: url('../images/logo.png');
+      background-size: cover;
+    }
+
+    .banner_links {
+      position:absolute;
+      right:10px;
+      top:0;
+      display:inline-block;
+      height:100%;
+    }
+    .banner_links .link_1{
+      color:$yellow;
+      font-family: "Neue-helvetica", helvetica, sans-serif;
+      font-size: 24px;
+      @include vertical-align();
+    }
+  }
+
+  #shiny {
+    width: 100%;
+    height: 400px;
+    margin:2rem 0;
+    background: azure;
+    border: 1px blue dotted;
+  }
+
+
+
+
+}

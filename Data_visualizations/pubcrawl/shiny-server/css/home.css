@@ -1,0 +1,134 @@
+/* Welcome to Compass.
+ * In this file you should write your main styles. (or centralize your imports)
+ * Import this file using the following HTML or equivalent:
+ * <link href="/stylesheets/home.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+/* line 5, ../../../../.rbenv/versions/2.5.0/lib/ruby/gems/2.5.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
+}
+
+/* line 22, ../../../../.rbenv/versions/2.5.0/lib/ruby/gems/2.5.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+html {
+  line-height: 1;
+}
+
+/* line 24, ../../../../.rbenv/versions/2.5.0/lib/ruby/gems/2.5.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+ol, ul {
+  list-style: none;
+}
+
+/* line 26, ../../../../.rbenv/versions/2.5.0/lib/ruby/gems/2.5.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* line 28, ../../../../.rbenv/versions/2.5.0/lib/ruby/gems/2.5.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+/* line 30, ../../../../.rbenv/versions/2.5.0/lib/ruby/gems/2.5.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+q, blockquote {
+  quotes: none;
+}
+/* line 103, ../../../../.rbenv/versions/2.5.0/lib/ruby/gems/2.5.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+q:before, q:after, blockquote:before, blockquote:after {
+  content: "";
+  content: none;
+}
+
+/* line 32, ../../../../.rbenv/versions/2.5.0/lib/ruby/gems/2.5.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+a img {
+  border: none;
+}
+
+/* line 116, ../../../../.rbenv/versions/2.5.0/lib/ruby/gems/2.5.0/gems/compass-core-1.0.3/stylesheets/compass/reset/_utilities.scss */
+article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
+  display: block;
+}
+
+/* line 14, ../scss/_main.scss */
+a {
+  text-decoration: none;
+}
+
+/* line 17, ../scss/_main.scss */
+a:hover {
+  text-decoration: underline;
+}
+
+/* line 21, ../scss/_main.scss */
+html {
+  font-family: "Neue-helvetica", helvetica, sans-serif;
+}
+
+/* line 29, ../scss/_main.scss */
+#main #banner {
+  width: 100%;
+  display: block;
+  background: #05543D;
+  color: white;
+  position: relative;
+  line-height: 0;
+}
+/* line 38, ../scss/_main.scss */
+#main #banner #logo {
+  display: inline-block;
+  padding: 10px;
+}
+/* line 42, ../scss/_main.scss */
+#main #banner #logo a {
+  height: 50px;
+  width: 50px;
+  display: block;
+  background-image: url("../images/logo.png");
+  background-size: cover;
+}
+/* line 50, ../scss/_main.scss */
+#main #banner .banner_links {
+  position: absolute;
+  right: 10px;
+  top: 0;
+  display: inline-block;
+  height: 100%;
+}
+/* line 57, ../scss/_main.scss */
+#main #banner .banner_links .link_1 {
+  color: #FEC23B;
+  font-family: "Neue-helvetica", helvetica, sans-serif;
+  font-size: 24px;
+  position: relative;
+  top: 50%;
+  display: block;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+/* line 65, ../scss/_main.scss */
+#main #shiny {
+  width: 100%;
+  height: 400px;
+  margin: 2rem 0;
+  background: azure;
+  border: 1px blue dotted;
+}

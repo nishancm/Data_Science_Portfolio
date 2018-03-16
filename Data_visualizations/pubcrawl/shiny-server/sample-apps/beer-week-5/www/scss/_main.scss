@@ -1,0 +1,155 @@
+// school colors:
+$green: #05543D;
+$yellow: #FEC23B;
+
+
+//beer week colors
+$baby_blue: #9ED6E6;
+$light_blue: #0b85a4;
+$dark_blue: #002730;
+$orange: #F6963A;
+
+
+@mixin vertical-align($position: relative) {
+  position: $position;
+  top: 50%;
+  display:block;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+a{
+  text-decoration:none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+html{
+  font-family: "Neue-helvetica", helvetica, sans-serif;
+
+}
+
+body > .container-fluid {
+
+  input[type='checkbox'] {
+    display:none;
+  }
+  input[type='checkbox']:checked + span {
+    background: #2c3e50;
+    color:whitesmoke;
+    transition: font-size,background, color .75s;
+  }
+  input[type='checkbox'] + span {
+    transition: font-size,background, color .75s;
+  }
+
+  input[type='checkbox'] + span i {
+
+  }
+  //This is the selector for the beer type list
+  #beertype {
+    //display:none;
+  }
+}
+
+#main{
+  padding:0;
+
+
+  #banner {
+    width: 100%;
+    display:block;
+    background: azure;
+    //background: $green;
+    color: white;
+    position:relative;
+    line-height: 0;
+  
+
+    #logo{
+      display:inline-block;
+      padding:10px;
+    }
+    #logo a{
+      height: 50px;
+      width:50px;
+      display:block;
+      background-image: url('../images/logo.png');
+      background-size: cover;
+    }
+
+    .banner_links {
+      position:absolute;
+      right:10px;
+      top:0;
+      display:inline-block;
+      height:100%;
+    }
+    .banner_links .link_1{
+      color:$dark_blue;
+      font-family: "Neue-helvetica", helvetica, sans-serif;
+      font-size: 24px;
+      @include vertical-align();
+    }
+  }
+
+  div#top_row {
+    label {
+      padding:0;
+    }
+    &.row{
+      height: auto !important;
+    }
+    .checkbox {
+      text-align: center;
+      margin:0;
+      min-height:0;
+    }
+    .checkbox span {
+      font-size: 22px;
+    }
+    label {
+      min-height:0;
+      padding:0;
+    }    
+    .form-group {
+      margin:0;
+    }
+
+  }
+  #banner + .form-group {
+    .top_btn_style {
+
+    }
+  }
+
+  #filter_bar {
+    .shiny-input-checkboxgroup, .shiny-input-container, #filters {
+      margin:0 !important;
+    }
+    .btn {
+      border-radius:0px;
+    }
+    .col-sm-2 {
+      padding-left:0;
+    }
+    .col-sm-10 {
+      padding-right:0;
+    }
+  }
+
+  //the panel
+  div.panel#controls {
+    background: rgba(255,255,255,.8);
+    padding: 10px;
+
+    label.control-label {
+      margin: 0 0 4px 0;
+      font-family:  helveticaNeue-Light,Neue-helvetica, helvetica, sans-serif;
+    }
+  }
+
+
+}
