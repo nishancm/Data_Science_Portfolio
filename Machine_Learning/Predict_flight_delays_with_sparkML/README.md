@@ -1,14 +1,11 @@
 # Introduction
 
-This project will host a webserver in AWS to display a list of [bbc](http://mlg.ucd.ie/datasets/bbc.html) articles. When an article link is clicked a new web page will show the content of the article along with similar articles as recommnedations in the side. 
+In this project we build a machine learning pipeline to predict flight delays. Data for this project are extracted from [here](http://stat-computing.org/dataexpo/2009/the-data.html). Tasks involved are,
 
-# Finding similar articles
+* Store data in AWS S3
+* Spun up a spark ec2-cluster with master and 2 slaves
+* Load data in to MongoDB installed in the cluster
+* Clean the data and convert in to a SparkSQL table
+* Apply Random Forest algorithm in SparkML to predict flight delays
 
-For each article, article centroid is derived by taking the mean of word vectors available from [Stanford Glove project](https://nlp.stanford.edu/projects/glove/). Then for each article euclidean distance to all other articles are calculated. Articles with minimum euclidean distance to a particlar article will be identified as similar articles.
-
-# Running the app
-
-Login to AWS instance and install `flask and gunicorn` python libraries. Download 300 dimension glove file, and bbc article corpus. Run the following command.
-```
-gunicorn -D --threads 4 -b 0.0.0.0:5000 --access-logfile server.log --timeout 60 server:app <path to glove file> <path to bbc corpus>
-```
+Also refer the slide deck for the process followed and the results. 
