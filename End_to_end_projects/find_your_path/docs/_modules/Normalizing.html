@@ -1,0 +1,564 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Normalizing &#8212; FindYourPath  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Normalizing</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">ast</span>
+
+<span class="n">data_path</span> <span class="o">=</span> <span class="s2">&quot;../Data/Resume_cleaned/ordered_profiles&quot;</span>
+<span class="n">destination_path</span> <span class="o">=</span> <span class="s2">&quot;../Data/job_profiles/&quot;</span>
+
+<span class="n">title_map</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="sa">u</span><span class="s1">&#39;amin and shah associates - ahmedabad&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;software engineer &amp; architect&#39;</span><span class="p">:</span> <span class="s1">&#39;software engineer&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;data science&#39;</span><span class="p">:</span> <span class="s1">&#39;data science&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;u&quot;financial analyst&#39;</span><span class="p">:</span> <span class="s1">&#39;financial analyst&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;u&quot;vp of marketing &amp; business development&#39;</span><span class="p">:</span> <span class="s1">&#39;vp marketing&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;engineering&#39;</span><span class="p">:</span> <span class="s1">&#39;engineer&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;engineering manager&#39;</span><span class="p">:</span> <span class="s1">&#39;engineer manager&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;in advertising&#39;</span><span class="p">:</span> <span class="s1">&#39;advertising&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;sales associate&#39;</span><span class="p">:</span> <span class="s1">&#39;sales&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;lead technical / business strategist / dmts&#39;</span><span class="p">:</span> <span class="s1">&#39;business analyst&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;strategy director / dmts&#39;</span><span class="p">:</span> <span class="s1">&#39;business analyst&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;product architects&#39;</span><span class="p">:</span> <span class="s1">&#39;product architect&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;PharmD&#39;</span><span class="p">:</span> <span class="s1">&#39;doctor&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;microprocessor engineer - team lead&#39;</span><span class="p">:</span> <span class="s1">&#39;engineer&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;B.S. in Electrical &amp; Electronics&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;Bachelor of Science in Electrical &amp; Electronics&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;recruiter&#39;</span><span class="p">:</span> <span class="s1">&#39;recruiter&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;director of facilities &amp; plant operations&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;director of operations&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;M.S. in Statistics&#39;</span><span class="p">:</span> <span class="s1">&#39;Master of Science in Data science&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;B.S. in Mechanical Engineering in With a focs in Mechatronics&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;Bachelor of Science in Mechanical Engineering&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;junior architect&#39;</span><span class="p">:</span> <span class="s1">&#39;architect&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;staff it auditor&#39;</span><span class="p">:</span> <span class="s1">&#39;auditor&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;bachelor of arts in economics&#39;</span><span class="p">:</span> <span class="s1">&#39;bachelor of arts&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;design and marketing director&#39;</span><span class="p">:</span> <span class="s1">&#39;marketing director&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;it auditor&#39;</span><span class="p">:</span> <span class="s1">&#39;auditor&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;&quot;Bachelors in Healthcare Management/Administration&quot;&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;Bachelors in Administration&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;thousands of data analysts&#39;</span><span class="p">:</span> <span class="s1">&#39;data science&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;business analyst&#39;</span><span class="p">:</span> <span class="s1">&#39;business analyst&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;and backend engineers&#39;</span><span class="p">:</span> <span class="s1">&#39;software engineer&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;u&quot;recruiter&#39;</span><span class="p">:</span> <span class="s1">&#39;recuiter&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;bachelor of science in medical technology&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;bachelor of science in medicine&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;associate&#39;</span><span class="p">:</span> <span class="s1">&#39;associate&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;vp of operations&#39;</span><span class="p">:</span> <span class="s1">&#39;vp of operations&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;degree_2 :&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;diploma&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;software engineer&#39;</span><span class="p">:</span> <span class="s1">&#39;software engineer&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;u&quot;sales associate&#39;</span><span class="p">:</span> <span class="s1">&#39;sales&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;bachelor of science in mechanical engineering&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;bachelor of science in mechanical engineering&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;high school or eqivalent&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;managed and developed junior analyst&#39;</span><span class="p">:</span> <span class="s1">&#39;data science&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;supervise recruiter&#39;</span><span class="p">:</span> <span class="s1">&#39;recruiter&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;degree_1 :&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;engineers&#39;</span><span class="p">:</span> <span class="s1">&#39;engineer&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;b.s in fashion design&#39;</span><span class="p">:</span> <span class="s1">&#39;bachelor of science in fashion&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;product and engineering teams&#39;</span><span class="p">:</span> <span class="s1">&#39;engineer&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;u&quot;senior systems engineer&#39;</span><span class="p">:</span> <span class="s1">&#39;software engineer&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;senior revenue analyst&#39;</span><span class="p">:</span> <span class="s1">&#39;business analyst&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;lead technical / business strategist/ dmts&#39;</span><span class="p">:</span> <span class="s1">&#39;business analyst&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;mechanical design engineer&#39;</span><span class="p">:</span> <span class="s1">&#39;engineer&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;&quot;bachelors&quot;&#39;</span><span class="p">:</span> <span class="s1">&#39;bachelor of science in mechanical engineering&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;b.s. in electrical engineering&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;bachelor of science in electrical engineering&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;&quot;Masters in Compter Science&quot;&#39;</span><span class="p">:</span> <span class="s1">&#39;master of science in computer science&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;u&quot;decision scientist&#39;</span><span class="p">:</span> <span class="s1">&#39;business analyst&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;Bachelor of Engineering in Engineering&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;bachelor of science in electrical engineering&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;High School&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;Bachelors of Science in Hman Resorce Management&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;Bachelors in Administration&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;director of engineering &amp; facilities&#39;</span><span class="p">:</span> <span class="s1">&#39;director of engineering&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;human resource director&#39;</span><span class="p">:</span> <span class="s1">&#39;recuiter&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;architect / lead systems engineer&#39;</span><span class="p">:</span> <span class="s1">&#39;software engineer&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;BS in Bsiness Administration&#39;</span><span class="p">:</span> <span class="s1">&#39;Bachelors in Administration&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;u&quot;customer system engineer / advocate&#39;</span><span class="p">:</span> <span class="s1">&#39;software engineer&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;&quot;Bachelors in Bsiness Management&quot;&#39;</span><span class="p">:</span> <span class="s1">&#39;Bachelors in Administration&#39;</span><span class="p">,</span>
+    <span class="sa">u</span><span class="s1">&#39;master of science in architectre in architectre&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;master of science in architecture&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;data analyst &amp; operation assistant&#39;</span><span class="p">:</span> <span class="s1">&#39;data analyst&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;data analyst &amp; wholesale manager assistant&#39;</span><span class="p">:</span> <span class="s1">&#39;data analyst&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;bachelor of science in architectre&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;bachelor of science in architecture&#39;</span>
+<span class="p">}</span>
+
+<span class="n">title_map2</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;process engineering (technical services)&quot;</span><span class="p">:</span> <span class="s2">&quot;process engineer&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;b.s. in mechanical engineering in with a focs in mechatronics&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in mechanical engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;aerospace engineer (contract)&quot;</span><span class="p">:</span> <span class="s2">&quot;aerospace engineer&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lead electromechanical engineer&quot;</span><span class="p">:</span> <span class="s2">&quot;senior electromechanical engineer&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;senior engineering manager&quot;</span><span class="p">:</span> <span class="s2">&quot;senior engineer manager&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lead engineer &amp; founder&quot;</span><span class="p">:</span> <span class="s2">&quot;founder&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master in chemical engineering&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master of science in chemical engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;manager/assistant director&quot;</span><span class="p">:</span> <span class="s2">&quot;manager&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;associates of science in general science&quot;</span><span class="p">:</span> <span class="s2">&quot;diploma in general science&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in engineering in indstrial engineering&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in indstrial engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;associates of applied science in compter aided drafting and design&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;diploma in cad&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;engineering technician iii&quot;</span><span class="p">:</span> <span class="s2">&quot;technician&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;associate of science degree in mechanical engineering&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;diploma in mechanical engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;engineering technician&quot;</span><span class="p">:</span> <span class="s2">&quot;technician&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;engineering project manager - stores&quot;</span><span class="p">:</span> <span class="s2">&quot;engineering project manager&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bs in civil engineering&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in civil engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;preparation and evalation of projects&quot;</span><span class="p">:</span> <span class="s2">&quot;engineering project manager&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;assistant and supervisor of engineering projects&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;engineering project manager&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in graphic design&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in graphic design&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;carpenter restorer in restoration of works of art&quot;</span><span class="p">:</span> <span class="s2">&quot;carpenter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bs in chemical engineering&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in chemical engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;b.s. in physics in physics&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in physics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;b.s. in mechanical engineering&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in mechanical engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;senior plant engineer&quot;</span><span class="p">:</span> <span class="s2">&quot;senior engineer&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;project manager - corporate engineering&quot;</span><span class="p">:</span> <span class="s2">&quot;project manager&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mba in exective&quot;</span><span class="p">:</span> <span class="s2">&quot;master in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;associate (did not complete) in civil engineering&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;diploma in civil engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;senior structural engineering technician&quot;</span><span class="p">:</span> <span class="s2">&quot;senior technician&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in civil engineering in </span><span class="se">\</span>
+<span class="s2">     fndamentals of engineering exam&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in civil engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;as in mechanical &amp; general engineering technology&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in mechanical engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bs in manfactring technology&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in manufacturing technology&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ms in organizational leadership and qality&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master of science in organizational leadership and qality&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master in compters in compters&quot;</span><span class="p">:</span> <span class="s2">&quot;master of science in computer science&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sr. engineering manager&quot;</span><span class="p">:</span> <span class="s2">&quot;senior engineering manager&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;engineering / quality manager&quot;</span><span class="p">:</span> <span class="s2">&quot;quality manager&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in compter science&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in computer science&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;associates degree in compter aided design in atodesk&quot;</span><span class="p">:</span> <span class="s2">&quot;diploma in cad&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;a.a. in interdisciplinary stdies in interdisciplinary stdies&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;diploma in interdisciplinary studies&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;finance director/sales manager&quot;</span><span class="p">:</span> <span class="s2">&quot;finance director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;associates in stationary engineering&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;diploma in stationary engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in teaching&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in teaching&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in acconting and finance&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;finance manager/director&quot;</span><span class="p">:</span> <span class="s2">&quot;finance director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of economics in economics&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in economics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mba&quot;</span><span class="p">:</span> <span class="s2">&quot;master in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master of bsiness administration in capital markets</span><span class="se">\</span>
+<span class="s2">     and asset management immersion&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in acconting&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in accounting&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;b.a. in bsiness administration&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;finance director/secondary director&quot;</span><span class="p">:</span> <span class="s2">&quot;finance director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;finance director /sales manager&quot;</span><span class="p">:</span> <span class="s2">&quot;finance director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;m.a. in conseling&quot;</span><span class="p">:</span> <span class="s2">&quot;master in counseling&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in accounting&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in accounting&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in finance&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;associates degree/bachelor in criminal science/jstice&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in criminal science&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ba in bsiness administration&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bs in finance&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master of bsiness administration in strategy and finance&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor in management/finance&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in bsiness economics&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in economics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bs and gradate work&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;usn in usn.&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sales manager/finance director&quot;</span><span class="p">:</span> <span class="s2">&quot;finance director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of liberal arts and science in liberal arts and science&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in liberal arts&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;senior financial analyst/office manager&quot;</span><span class="p">:</span> <span class="s2">&quot;senior financial analyst&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;richard m squire and associates llc - jenkintown&quot;</span><span class="p">:</span> <span class="s2">&quot;associate&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;libereal arts in compter science&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in liberal arts&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master in psychology and sports management/marketing&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master in psychology&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in conseling edcation&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in counseling education&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;director of finance&quot;</span><span class="p">:</span> <span class="s2">&quot;finance director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bs in mechanical engineering&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in mechanical engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in business administration in business administration&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bs in acconting&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in accounting&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;masters in business administration&quot;</span><span class="p">:</span> <span class="s2">&quot;master in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;certification in business essentials&quot;</span><span class="p">:</span> <span class="s2">&quot;diploma in business&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;business/financial analyst&quot;</span><span class="p">:</span> <span class="s2">&quot;business analyst&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in finance in finance&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ba in commnications&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in communications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of business administration in corporate finance&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bs in economics in international economics and trade&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in economics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master in economics in international trade&quot;</span><span class="p">:</span> <span class="s2">&quot;master in economics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master in acconting&quot;</span><span class="p">:</span> <span class="s2">&quot;master of science in accounting&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;b.s.&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;m.b.a.&quot;</span><span class="p">:</span> <span class="s2">&quot;master in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in bsine ss&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in corporate finance/ business management&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in finance and real estate&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;financial analyst ii&quot;</span><span class="p">:</span> <span class="s2">&quot;senior financial analyst&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor in finance&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master of business administration&quot;</span><span class="p">:</span> <span class="s2">&quot;master in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of arts in business administration&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master in finance&quot;</span><span class="p">:</span> <span class="s2">&quot;master of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in economics in economics&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in economics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master of science in finance in information</span><span class="se">\</span>
+<span class="s2">     technology and electronic commerce&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mba in finance&quot;</span><span class="p">:</span> <span class="s2">&quot;master in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor in business administration finance&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;associates of science degree&quot;</span><span class="p">:</span> <span class="s2">&quot;diploma in science&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor in business administration in finance in business administration&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of business administration in finance&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in hman resorce management&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;recuiter&quot;</span><span class="p">:</span> <span class="s2">&quot;recruiter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in business administration/personnel management&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;director of facilities management/hr&quot;</span><span class="p">:</span> <span class="s2">&quot;hr director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in business management&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master in hman resorces management&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;human resource associate (contract)&quot;</span><span class="p">:</span> <span class="s2">&quot;human resource associate&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master of pblic administration in pblic administration&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master in public administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in hman resorce management&quot;</span><span class="p">:</span> <span class="s2">&quot;master in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bba&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in bank&quot;</span><span class="p">:</span> <span class="s2">&quot;human resource associate&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of arts in hman resorces&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;hr recruiter&quot;</span><span class="p">:</span> <span class="s2">&quot;recruiter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;human resource recruiter - client&quot;</span><span class="p">:</span> <span class="s2">&quot;recruiter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science degree in business management&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master degree in core&quot;</span><span class="p">:</span> <span class="s2">&quot;master in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bba in business administration&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ma in organizational management specialization hman resorces&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;director of human capital&quot;</span><span class="p">:</span> <span class="s2">&quot;hr director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;instructor/recruiter&quot;</span><span class="p">:</span> <span class="s2">&quot;recruiter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;driver recruiter&quot;</span><span class="p">:</span> <span class="s2">&quot;recruiter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;corporate recruiter&quot;</span><span class="p">:</span> <span class="s2">&quot;recruiter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;associates of art business in art business&quot;</span><span class="p">:</span> <span class="s2">&quot;diploma in business&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;interim human resources director&quot;</span><span class="p">:</span> <span class="s2">&quot;hr director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of arts in organizational development&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in organizational leadership&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master of science in organizational leadership&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master of science in organizational leadership&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor in bsiness administration&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;director of human resources&quot;</span><span class="p">:</span> <span class="s2">&quot;hr director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master in hman resorces development&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in bsiness administration and management&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mba in bsiness administration&quot;</span><span class="p">:</span> <span class="s2">&quot;master in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;n master of bsiness administration&quot;</span><span class="p">:</span> <span class="s2">&quot;master in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bs in bsiness management&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in hman resorce certification&quot;</span><span class="p">:</span> <span class="s2">&quot;diploma in human resource&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in general stdies&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in general studies&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;director of talent management&quot;</span><span class="p">:</span> <span class="s2">&quot;hr director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;director human resources&quot;</span><span class="p">:</span> <span class="s2">&quot;hr director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;a.a.s. in bsiness&quot;</span><span class="p">:</span> <span class="s2">&quot;diploma in business&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ba in sociology&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of arts in sociology&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;raskin &amp; associates&quot;</span><span class="p">:</span> <span class="s2">&quot;associate&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;associate of science in bsiness&quot;</span><span class="p">:</span> <span class="s2">&quot;diploma in business&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;manager/marketing director&quot;</span><span class="p">:</span> <span class="s2">&quot;marketing director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;activities director / marketing director&quot;</span><span class="p">:</span> <span class="s2">&quot;marketing director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;community admissions &amp; marketing director&quot;</span><span class="p">:</span> <span class="s2">&quot;marketing director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;activities director/ recovery coach / marketing&quot;</span><span class="p">:</span> <span class="s2">&quot;marketing director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;associates of science in marketing&quot;</span><span class="p">:</span> <span class="s2">&quot;diploma in marketing&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in marketing&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in marketing&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in bsiness and economics&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in economics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of arts in commnication stdies&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in communications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in bsiness administration&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of arts in american stdies&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of arts in american studies&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;director of marketing&quot;</span><span class="p">:</span> <span class="s2">&quot;marketing director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;marketing director/consultant&quot;</span><span class="p">:</span> <span class="s2">&quot;marketing director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in english literatre&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of arts in english literatre&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelors of science&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bs in marketing&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in marketing&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master of pblic administration in m health information systems&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master in public administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of arts in marketing management &amp; pblic relations&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in marketing&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bba in marketing&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in marketing&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in sales&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in sales&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;associate of arts in telecommnications in telecommnications&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;diploma in telecommunications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of arts in mass commnications in pblic relation&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in communications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;masters of science in hman services administration in overall gradate&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;marketing director/administrator&quot;</span><span class="p">:</span> <span class="s2">&quot;marketing director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in c technology&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in indstrial engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of business administration in finance/economics&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sr. financial analyst&quot;</span><span class="p">:</span> <span class="s2">&quot;senior financial analyst&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in corporate finance/ business management&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of arts in business administration&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master of business administration in deloitte technology&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master of science in finance in information technology and electronic commerce&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor in business administration in finance in business administration&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;senior financial analyst (consultant)&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;senior financial analyst&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;senior financial planning analyst&quot;</span><span class="p">:</span> <span class="s2">&quot;senior financial analyst&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master in finance in finance&quot;</span><span class="p">:</span> <span class="s2">&quot;master of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in business administration in business administration&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in business&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;business data analyst&quot;</span><span class="p">:</span> <span class="s2">&quot;business analyst&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;masters in business administration&quot;</span><span class="p">:</span> <span class="s2">&quot;master in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of business administration in corporate finance&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of business administration in finance&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor in business administration finance&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ma in theology and biblical stdies&quot;</span><span class="p">:</span> <span class="s2">&quot;master in theology and biblical studies&quot;</span><span class="p">,</span>
+    <span class="s1">&#39;bachelor of science in business administration&#39;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelo in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master in business administration w/ concentration in lean manfactring&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;masters of science in lean manfactring in operations management&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;master of science in operations management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ms-mechanical engineering in msme&quot;</span><span class="p">:</span> <span class="s2">&quot;master of science in mechanical engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;research analyst/assistant&quot;</span><span class="p">:</span> <span class="s2">&quot;research analyst&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ph.d. in mechanical engineering&quot;</span><span class="p">:</span> <span class="s2">&quot;phd in mechanical engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in mechanical engineering program&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in mechanical engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bse in mechanical&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in mechanical engineering&quot;</span><span class="p">,</span>
+    <span class="s1">&#39;master in mechanical engineering&#39;</span><span class="p">:</span> <span class="s1">&#39;master of science in mechanical engineering&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;engineering manager/proposal manager&quot;</span><span class="p">:</span> <span class="s2">&quot;engineer manager&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;engineering manager/sales&quot;</span><span class="p">:</span> <span class="s2">&quot;engineer manager&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in civil engineering gradate&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in civil engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;engineering field technician/ inspector&quot;</span><span class="p">:</span> <span class="s2">&quot;technician&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in mechanical engineering technology and prodct design&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in mechanical engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;manager engineering&quot;</span><span class="p">:</span> <span class="s2">&quot;engineer manager&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in mechanical engineering in mechanical engineering&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor of science in mechanical engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science degree in engineering&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in engineering&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tech/maint. supv./plant engineer&quot;</span><span class="p">:</span> <span class="s2">&quot;plant engineer&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;plant engineering manager&quot;</span><span class="p">:</span> <span class="s2">&quot;plant engineer manager&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mechanical engineering team manager&quot;</span><span class="p">:</span> <span class="s2">&quot;engineer manager&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;engineering and manufacturing technician&quot;</span><span class="p">:</span> <span class="s2">&quot;technician&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;in business administration&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in psychology in psychology&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in psychology&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;finance controller/director of finance&quot;</span><span class="p">:</span> <span class="s2">&quot;finance director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor in commnications&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in communications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;director/finance manager&quot;</span><span class="p">:</span> <span class="s2">&quot;finance manager&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;business and management&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;finance director/ manager&quot;</span><span class="p">:</span> <span class="s2">&quot;finance director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;post in business administration&quot;</span><span class="p">:</span> <span class="s2">&quot;master in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of business administration in business administration&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;m.b.a. in faclty&quot;</span><span class="p">:</span> <span class="s2">&quot;master in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;b.s. in business administration and finance&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;associate of science in business administration&quot;</span><span class="p">:</span> <span class="s2">&quot;diploma in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;certificate in hman resorce management&quot;</span><span class="p">:</span> <span class="s2">&quot;certificate in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in business administration/hman resorce management&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;degree in administration&quot;</span><span class="p">:</span> <span class="s2">&quot;diploma in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bs in hman resorces&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;achelor of arts in hman resorce management&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;master in organizational development&quot;</span><span class="p">:</span> <span class="s2">&quot;master of science in organizational leadership&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;certification in advanced hman capital management&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;certification in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;m.s. in hman resorce management&quot;</span><span class="p">:</span> <span class="s2">&quot;master in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;regional director of human resources&quot;</span><span class="p">:</span> <span class="s2">&quot;hr director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in business administration&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;certificate in administration &amp; finance&quot;</span><span class="p">:</span> <span class="s2">&quot;certificate in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;associate in applied science in airline and secretarial administration&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;diploma in applied science&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;human resources director&quot;</span><span class="p">:</span> <span class="s2">&quot;hr director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;administrative assistant/ hr associate&quot;</span><span class="p">:</span> <span class="s2">&quot;hr associate&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;b.s in business administration sbject&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;human resource manager/safety director&quot;</span><span class="p">:</span> <span class="s2">&quot;human resource manager&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of arts in hman resorce management&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor in business/hman resorces&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;certification in human resource management&quot;</span><span class="p">:</span> <span class="s2">&quot;certificate in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;human resource recruiter&quot;</span><span class="p">:</span> <span class="s2">&quot;recruiter&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;certification&quot;</span><span class="p">:</span> <span class="s2">&quot;certificate&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor in business/hman resorces&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of business administration in hman resorce management&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in human resource management&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in mass commnications&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in communications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;associate in jornalism/mass commnications&quot;</span><span class="p">:</span> <span class="s2">&quot;diploma in communication&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sr. marketing director&quot;</span><span class="p">:</span> <span class="s2">&quot;senior marketing director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor in emerging media and commnications&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in communications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;b.s. in marketing&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in marketing&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;director marketing&quot;</span><span class="p">:</span> <span class="s2">&quot;marketing director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of business administration in marketing&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;optical stylist/marketing directo&quot;</span><span class="p">:</span> <span class="s2">&quot;marketing director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor in international marketing&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in marketing&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ba in graphic commnication&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in communications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;art director/designer&quot;</span><span class="p">:</span> <span class="s2">&quot;art director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in business in marketing&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in marketing&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;community relations &amp; marketing director&quot;</span><span class="p">:</span> <span class="s2">&quot;marketing director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;director - sales and marketing&quot;</span><span class="p">:</span> <span class="s2">&quot;marketing director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;optical stylist/marketing director&quot;</span><span class="p">:</span> <span class="s2">&quot;marketing director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;associate of arts in psychology in psychology&quot;</span><span class="p">:</span> <span class="s2">&quot;diploma in psychology&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;events &amp; marketing director&quot;</span><span class="p">:</span> <span class="s2">&quot;marketing director&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;senior financial analyst/financial analyst&quot;</span><span class="p">:</span> <span class="s2">&quot;financial analyst&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of science in business administration in finance&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;bachelor in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;b.s.b.a. in finance in finance&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lead financial analyst&quot;</span><span class="p">:</span> <span class="s2">&quot;senior financial analyst&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bachelor of economics in labor and social economics&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in economics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;b.a. in acconting&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in accounting&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;b.s. in finance in finance&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor of science in finance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ba science&quot;</span><span class="p">:</span> <span class="s2">&quot;bachelor in science&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mba in health care administration&quot;</span><span class="p">:</span> <span class="s2">&quot;master in business administration&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;financial analyst/intern&quot;</span><span class="p">:</span> <span class="s2">&quot;intern&quot;</span>
+
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="normalize_profile"><a class="viewcode-back" href="../code.html#Normalizing.normalize_profile">[docs]</a><span class="k">def</span> <span class="nf">normalize_profile</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;normalize the titles from the resume with</span>
+<span class="sd">    the given job profile and save it as a different</span>
+<span class="sd">    file in the destination path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">))</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">destination</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cleaned_file</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="s2">&quot;bsiness&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;business&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="s2">&quot;certification&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;certificate&quot;</span><span class="p">)</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="s2">&quot;masters&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;master&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="s2">&quot;bachelors&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;bachelor&quot;</span><span class="p">)</span>
+                <span class="n">dic</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">profile</span> <span class="ow">in</span> <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;userID&#39;</span><span class="p">]:</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="n">events</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;events&#39;</span><span class="p">]</span>
+                    <span class="n">events</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">events</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">)):</span>
+                        <span class="k">if</span> <span class="n">events</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">title_map2</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">events</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">title_map2</span><span class="p">[</span><span class="n">events</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]]</span>
+                        <span class="k">elif</span> <span class="n">events</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">title_map</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">events</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">title_map</span><span class="p">[</span><span class="n">events</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]]</span>
+                    <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;events&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">events</span>
+                    <span class="n">cleaned_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">dic</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">40</span><span class="p">:</span>
+                        <span class="k">break</span></div>
+
+
+<span class="n">normalize_profile</span><span class="p">(</span><span class="s2">&quot;Engineering Manager&quot;</span><span class="p">,</span> <span class="n">destination_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+
+<span class="n">normalize_profile</span><span class="p">(</span><span class="s2">&quot;Finance Manager&quot;</span><span class="p">,</span> <span class="n">destination_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+
+<span class="n">normalize_profile</span><span class="p">(</span><span class="s2">&quot;Human Resource Manager&quot;</span><span class="p">,</span> <span class="n">destination_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+
+<span class="n">normalize_profile</span><span class="p">(</span><span class="s2">&quot;Marketing Director&quot;</span><span class="p">,</span> <span class="n">destination_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+
+<span class="n">normalize_profile</span><span class="p">(</span><span class="s2">&quot;Financial Analyst&quot;</span><span class="p">,</span> <span class="n">destination_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Alvira Swalin, Asmita Vikas, Neerja Doshi, Nishan Madawanarachchi, Ford Higgins, Spencer Stanley.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>API Reference &#8212; FindYourPath  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Find Your Path Tutorial" href="tutorial.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-Extract_Resume_From_URL">
+<span id="api-reference"></span><h1>API Reference<a class="headerlink" href="#module-Extract_Resume_From_URL" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-MongoDB_create"></span><dl class="function">
+<dt id="MongoDB_create.import_query">
+<code class="descclassname">MongoDB_create.</code><code class="descname">import_query</code><span class="sig-paren">(</span><em>dbname</em>, <em>collection_name</em>, <em>input_file_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/MongoDB_create.html#import_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#MongoDB_create.import_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>create mongodb</p>
+</dd></dl>
+
+<span class="target" id="module-Resume_Extract_Education"></span><dl class="function">
+<dt id="Resume_Extract_Education.degree_json">
+<code class="descclassname">Resume_Extract_Education.</code><code class="descname">degree_json</code><span class="sig-paren">(</span><em>education</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Resume_Extract_Education.html#degree_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Resume_Extract_Education.degree_json" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>education</strong> &#8211; is a string of educations of a profile</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the json blob for education in chronological order</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="module-Resume_Extract_Work_Experience"></span><dl class="function">
+<dt id="Resume_Extract_Work_Experience.job_extract">
+<code class="descclassname">Resume_Extract_Work_Experience.</code><code class="descname">job_extract</code><span class="sig-paren">(</span><em>folder_profile_df</em>, <em>titles</em>, <em>destination_folder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Resume_Extract_Work_Experience.html#job_extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Resume_Extract_Work_Experience.job_extract" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>folder_profile_df</strong> &#8211; This folder consist of all the files parsed
+from Indeed for different profiles</li>
+<li><strong>titles</strong> &#8211; list of all the titles to be extracted</li>
+<li><strong>destination_folder</strong> &#8211; This folder consist is the destination where
+the extracted data will be saved in the form
+of multiple files</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">saves the extracted data in the destination folder</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="module-URL_extraction"></span><dl class="function">
+<dt id="URL_extraction.get_job_url">
+<code class="descclassname">URL_extraction.</code><code class="descname">get_job_url</code><span class="sig-paren">(</span><em>job_title</em>, <em>need</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/URL_extraction.html#get_job_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#URL_extraction.get_job_url" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Get URLs of indeed resumes for a given job title</dt>
+<dd>until the required number resumes (need) is met</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>job_title</strong> &#8211; job title interested</li>
+<li><strong>need</strong> &#8211; number of resumes needed</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">URLs as a list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="URL_extraction.get_title">
+<code class="descclassname">URL_extraction.</code><code class="descname">get_title</code><span class="sig-paren">(</span><em>job_title</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/URL_extraction.html#get_title"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#URL_extraction.get_title" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Navigate to the main web page for a given job</dt>
+<dd>title in indeed for US candidates</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>job_title</strong> &#8211; job title interested</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Google chrome driver object after navigation</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="URL_extraction.get_urls">
+<code class="descclassname">URL_extraction.</code><code class="descname">get_urls</code><span class="sig-paren">(</span><em>driver</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/URL_extraction.html#get_urls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#URL_extraction.get_urls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find all URLs for resumes in a given webpage
+:param driver: Google chrome driver
+:return: URLs as a list</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="URL_extraction.next_page">
+<code class="descclassname">URL_extraction.</code><code class="descname">next_page</code><span class="sig-paren">(</span><em>driver</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/URL_extraction.html#next_page"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#URL_extraction.next_page" title="Permalink to this definition">¶</a></dt>
+<dd><p>Go to next web page containing resumes
+:param driver: Google chrome driver
+:return: None</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="URL_extraction.write_url_file">
+<code class="descclassname">URL_extraction.</code><code class="descname">write_url_file</code><span class="sig-paren">(</span><em>job_title</em>, <em>urls</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/URL_extraction.html#write_url_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#URL_extraction.write_url_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write all resume URLs extracted for given job title in to a file
+:param job_title: job title interested
+:param urls: All URLs extracted as a list
+:return: None</p>
+</dd></dl>
+
+<span class="target" id="module-deploy"></span><dl class="function">
+<dt id="deploy.deploy">
+<code class="descclassname">deploy.</code><code class="descname">deploy</code><span class="sig-paren">(</span><em>path</em>, <em>update</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/deploy.html#deploy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#deploy.deploy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Login to EC2 instance, clone the git repo for FindYourPath
+Update the mongo database if specified and launch the flask server
+:param path: path of the pemfile
+:param update: value provided as argument when script from shell</p>
+<blockquote>
+<div>(value &#8216;update&#8217; willl update the mongo database)</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="module-flask_server"></span><dl class="function">
+<dt id="flask_server.hello">
+<code class="descclassname">flask_server.</code><code class="descname">hello</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/flask_server.html#hello"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flask_server.hello" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-upload_data_to_MongoDB"></span><dl class="function">
+<dt id="upload_data_to_MongoDB.import_query">
+<code class="descclassname">upload_data_to_MongoDB.</code><code class="descname">import_query</code><span class="sig-paren">(</span><em>dbname</em>, <em>collection_name</em>, <em>input_file_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/upload_data_to_MongoDB.html#import_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#upload_data_to_MongoDB.import_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>produce mongodb import query for given database, collection,
+and input file</p>
+<p>dbname: (str) name of database to connect to
+collection_name: (str) name of collection within database
+input_file_name: (str) name of input file</p>
+<p>mongoimport_query: fully-formed query for mongodb with given
+database name, collection name, input file name</p>
+</dd></dl>
+
+<span class="target" id="module-to_json"></span><dl class="function">
+<dt id="to_json.job_extract">
+<code class="descclassname">to_json.</code><code class="descname">job_extract</code><span class="sig-paren">(</span><em>folder_profile_df</em>, <em>titles</em>, <em>destination_folder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/to_json.html#job_extract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#to_json.job_extract" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>folder_profile_df</strong> &#8211; This folder consist of all the files parsed
+from Indeed for different profiles</li>
+<li><strong>titles</strong> &#8211; list of all the titles to be extracted</li>
+<li><strong>destination_folder</strong> &#8211; This folder consist is the destination where
+the extracted data will be saved in teh form
+of multiple files</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">saves the extracted data in the destination folder</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="module-Normalizing"></span><dl class="function">
+<dt id="Normalizing.normalize_profile">
+<code class="descclassname">Normalizing.</code><code class="descname">normalize_profile</code><span class="sig-paren">(</span><em>profile</em>, <em>destination</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Normalizing.html#normalize_profile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Normalizing.normalize_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>normalize the titles from the resume with
+the given job profile and save it as a different
+file in the destination path</p>
+</dd></dl>
+
+<span class="target" id="module-generate_graph_objects"></span><dl class="function">
+<dt id="generate_graph_objects.combine_two_graphs">
+<code class="descclassname">generate_graph_objects.</code><code class="descname">combine_two_graphs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/generate_graph_objects.html#combine_two_graphs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#generate_graph_objects.combine_two_graphs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create data frame containing edge details</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="generate_graph_objects.create_graphs">
+<code class="descclassname">generate_graph_objects.</code><code class="descname">create_graphs</code><span class="sig-paren">(</span><em>combined_df</em>, <em>using=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/generate_graph_objects.html#create_graphs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#generate_graph_objects.create_graphs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the graph based on type of graph specified</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="generate_graph_objects.save_graph">
+<code class="descclassname">generate_graph_objects.</code><code class="descname">save_graph</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/generate_graph_objects.html#save_graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#generate_graph_objects.save_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the graphs generated</p>
+</dd></dl>
+
+<span class="target" id="module-graph_converter"></span><p>file to turn json-encoded sequential experience
+data into edgelist-representation graphs</p>
+<dl class="function">
+<dt id="graph_converter.to_count_graph">
+<code class="descclassname">graph_converter.</code><code class="descname">to_count_graph</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/graph_converter.html#to_count_graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph_converter.to_count_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a graph whose edges are weighted
+by the count of items on the edge;
+i.e., the number of people who have made the
+transition from position A to position B</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="graph_converter.to_edgelist">
+<code class="descclassname">graph_converter.</code><code class="descname">to_edgelist</code><span class="sig-paren">(</span><em>graph</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/graph_converter.html#to_edgelist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graph_converter.to_edgelist" title="Permalink to this definition">¶</a></dt>
+<dd><p>take a dictionary representation of a graph
+and return an edgelist</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Param:</th><td class="field-body">graph: dictionary as {
+position: {position: n people}</td>
+</tr>
+</tbody>
+</table>
+<p>}; i.e., for each position/event, how many people moved to
+each subsequent position</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">edgelist: pd DataFrame of from, to, count</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="module-highest_freq"></span><dl class="function">
+<dt id="highest_freq.top3">
+<code class="descclassname">highest_freq.</code><code class="descname">top3</code><span class="sig-paren">(</span><em>current_node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/highest_freq.html#top3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#highest_freq.top3" title="Permalink to this definition">¶</a></dt>
+<dd><p>return 3 most frequent next steps for given job title</p>
+</dd></dl>
+
+<span class="target" id="module-shortest_paths"></span><dl class="function">
+<dt id="shortest_paths.current_and_aim">
+<code class="descclassname">shortest_paths.</code><code class="descname">current_and_aim</code><span class="sig-paren">(</span><em>current</em>, <em>aim</em>, <em>weight=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shortest_paths.html#current_and_aim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shortest_paths.current_and_aim" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="shortest_paths.k_shortest_paths_default">
+<code class="descclassname">shortest_paths.</code><code class="descname">k_shortest_paths_default</code><span class="sig-paren">(</span><em>G</em>, <em>source</em>, <em>target</em>, <em>k</em>, <em>weight=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shortest_paths.html#k_shortest_paths_default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shortest_paths.k_shortest_paths_default" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="shortest_paths.shortest_path_basis_weight">
+<code class="descclassname">shortest_paths.</code><code class="descname">shortest_path_basis_weight</code><span class="sig-paren">(</span><em>g</em>, <em>source</em>, <em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shortest_paths.html#shortest_path_basis_weight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shortest_paths.shortest_path_basis_weight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="shortest_paths.transform_function">
+<code class="descclassname">shortest_paths.</code><code class="descname">transform_function</code><span class="sig-paren">(</span><em>current</em>, <em>aim</em>, <em>g</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shortest_paths.html#transform_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shortest_paths.transform_function" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-shortest_time_output"></span><dl class="function">
+<dt id="shortest_time_output.find_shortest_time_paths">
+<code class="descclassname">shortest_time_output.</code><code class="descname">find_shortest_time_paths</code><span class="sig-paren">(</span><em>path</em>, <em>input_title</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shortest_time_output.html#find_shortest_time_paths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shortest_time_output.find_shortest_time_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an input, find the top 3 outputs based on shortest time</p>
+</dd></dl>
+
+<span class="target" id="module-time_based_graph_generator"></span><dl class="function">
+<dt id="time_based_graph_generator.clean_edgelist">
+<code class="descclassname">time_based_graph_generator.</code><code class="descname">clean_edgelist</code><span class="sig-paren">(</span><em>e</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/time_based_graph_generator.html#clean_edgelist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#time_based_graph_generator.clean_edgelist" title="Permalink to this definition">¶</a></dt>
+<dd><p>clean the junk out of edgelists</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="time_based_graph_generator.to_edgelist">
+<code class="descclassname">time_based_graph_generator.</code><code class="descname">to_edgelist</code><span class="sig-paren">(</span><em>graph</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/time_based_graph_generator.html#to_edgelist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#time_based_graph_generator.to_edgelist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given graph as dictionary, convert to edgelist</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="time_based_graph_generator.to_time_graph">
+<code class="descclassname">time_based_graph_generator.</code><code class="descname">to_time_graph</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/time_based_graph_generator.html#to_time_graph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#time_based_graph_generator.to_time_graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a graph whose edges are weighted by the number of years it took from A to B</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="tutorial.html" title="previous chapter">Find Your Path Tutorial</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/code.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Alvira Swalin, Asmita Vikas, Neerja Doshi, Nishan Madawanarachchi, Ford Higgins, Spencer Stanley.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/code.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

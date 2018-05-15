@@ -1,0 +1,33 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+Example
+{% endblock %}
+
+{% block navbar %}
+    {% include 'navbar.html' %}
+{% endblock %}
+
+{% block content %}
+    {% include 'dropdown.html' %}
+    <br>
+    <div class="container">
+        <div class="media">
+            <div class="media-left">
+                <a href="https://msds698.github.io/findyourpath/">
+                <img class="media-object" src={{ url_for('static',filename='fyp_example.png') }} width = "300" height = "400">
+                </a>
+            </div>
+            <div class="media-body">
+                <h3 class="media-heading">Meet Michael</h3>
+                He’s a senior software engineer at a multinational company.
+                After completing a couple of recent projects which required collaborating with many colleagues,  he developed a strong interest towards human resource management.  He is considering making career switch. <br><br>
+
+                <i>But how?</i> <br><br>
+
+                This is where Find Your Path comes in! Using network analysis and machine learning, we find the most common steps taken by other professionals who made similar career changes. 
+            </div>
+        </div>
+    </div> <!-- /container -->
+{% endblock %}

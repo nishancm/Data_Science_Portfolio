@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>URL_extraction &#8212; FindYourPath  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for URL_extraction</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">selenium</span> <span class="k">import</span> <span class="n">webdriver</span>
+
+
+<div class="viewcode-block" id="get_job_url"><a class="viewcode-back" href="../code.html#URL_extraction.get_job_url">[docs]</a><span class="k">def</span> <span class="nf">get_job_url</span><span class="p">(</span><span class="n">job_title</span><span class="p">,</span> <span class="n">need</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get URLs of indeed resumes for a given job title</span>
+<span class="sd">        until the required number resumes (need) is met</span>
+<span class="sd">    :param job_title: job title interested</span>
+<span class="sd">    :param need: number of resumes needed</span>
+<span class="sd">    :return: URLs as a list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">links</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># to avoid duplicates</span>
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">get_title</span><span class="p">(</span><span class="n">job_title</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># don&#39;t call next driver function before loading</span>
+
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">links</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">need</span><span class="p">:</span>
+        <span class="n">links</span> <span class="o">=</span> <span class="n">links</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">get_urls</span><span class="p">(</span><span class="n">driver</span><span class="p">))</span>
+        <span class="n">next_page</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+
+    <span class="n">driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">links</span></div>
+
+
+<div class="viewcode-block" id="get_title"><a class="viewcode-back" href="../code.html#URL_extraction.get_title">[docs]</a><span class="k">def</span> <span class="nf">get_title</span><span class="p">(</span><span class="n">job_title</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Navigate to the main web page for a given job</span>
+<span class="sd">        title in indeed for US candidates</span>
+<span class="sd">    :param job_title: job title interested</span>
+<span class="sd">    :return: Google chrome driver object after navigation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">()</span>  <span class="c1"># &#39;/usr/local/bin/chromedriver&#39;)</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;https://resumes.indeed.com&#39;</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">)</span>  <span class="c1"># find text box to enter title</span>
+    <span class="n">title</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>  <span class="c1"># clear text box</span>
+    <span class="n">title</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">job_title</span><span class="p">)</span>
+
+    <span class="n">where</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s1">&#39;l&#39;</span><span class="p">)</span>
+    <span class="n">where</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">where</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s1">&#39;United States&#39;</span><span class="p">)</span>  <span class="c1"># only interested in resumes from US</span>
+    <span class="n">where</span><span class="o">.</span><span class="n">submit</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">driver</span></div>
+
+
+<div class="viewcode-block" id="get_urls"><a class="viewcode-back" href="../code.html#URL_extraction.get_urls">[docs]</a><span class="k">def</span> <span class="nf">get_urls</span><span class="p">(</span><span class="n">driver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find all URLs for resumes in a given webpage</span>
+<span class="sd">    :param driver: Google chrome driver</span>
+<span class="sd">    :return: URLs as a list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">clients</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_elements_by_class_name</span><span class="p">(</span>
+        <span class="s1">&#39;rezemp-u-h4&#39;</span><span class="p">)</span>  <span class="c1"># point to resumes</span>
+    <span class="n">links</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">clients</span><span class="p">]</span>  <span class="c1"># resume links</span>
+
+    <span class="k">return</span> <span class="n">links</span></div>
+
+
+<div class="viewcode-block" id="next_page"><a class="viewcode-back" href="../code.html#URL_extraction.next_page">[docs]</a><span class="k">def</span> <span class="nf">next_page</span><span class="p">(</span><span class="n">driver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Go to next web page containing resumes</span>
+<span class="sd">    :param driver: Google chrome driver</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">next_</span> <span class="o">=</span> <span class="s2">&quot;.icl-TextLink.icl-TextLink--primary.rezemp-pagination-nextbutton&quot;</span>
+    <span class="n">next_page</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_css_selector</span><span class="p">(</span><span class="n">next_</span><span class="p">)</span>
+    <span class="n">next_page</span><span class="o">.</span><span class="n">click</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="write_url_file"><a class="viewcode-back" href="../code.html#URL_extraction.write_url_file">[docs]</a><span class="k">def</span> <span class="nf">write_url_file</span><span class="p">(</span><span class="n">job_title</span><span class="p">,</span> <span class="n">urls</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write all resume URLs extracted for given job title in to a file</span>
+<span class="sd">    :param job_title: job title interested</span>
+<span class="sd">    :param urls: All URLs extracted as a list</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;Data/Profile_URLs/&#39;</span> <span class="o">+</span> <span class="n">job_title</span> <span class="o">+</span> <span class="s1">&#39;.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">urls</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">u</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">job_titles</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;Data Scientist&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Data Analyst&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Data Engineer&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Software Engineer&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Business Analyst&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Product Manager&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;VP of Engineering&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;VP of Marketing&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Financial Analyst&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Business Strategist&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Engineering Manager&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Sales Manager&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Finance Manager&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Sales Associate&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Operation Analyst&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;VP of Operations&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Operation Manager&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Architect&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Software Architect&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Human Resource Manager&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Recruiter&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Marketing Director&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Auditor&#39;</span><span class="p">]</span>
+
+    <span class="n">need</span> <span class="o">=</span> <span class="mi">500</span>
+    <span class="k">for</span> <span class="n">jt</span> <span class="ow">in</span> <span class="n">job_titles</span><span class="p">:</span>
+        <span class="n">urls</span> <span class="o">=</span> <span class="n">get_job_url</span><span class="p">(</span><span class="n">jt</span><span class="p">,</span> <span class="n">need</span><span class="p">)</span>
+        <span class="n">write_url_file</span><span class="p">(</span><span class="n">jt</span><span class="p">,</span> <span class="n">urls</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Alvira Swalin, Asmita Vikas, Neerja Doshi, Nishan Madawanarachchi, Ford Higgins, Spencer Stanley.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

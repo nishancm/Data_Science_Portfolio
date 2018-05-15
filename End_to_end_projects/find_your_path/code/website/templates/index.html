@@ -1,0 +1,38 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}
+Index
+{% endblock %}
+
+{% block navbar %}
+    {% include 'navbar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="well">
+    <h3>Find Your Path: Map Out Your Next Career Moves!</h3>
+    <p>
+    Need help deciding which jobs to apply to? Unsure of which steps are necessary to reach your dream job? <br>
+    Check out <b>Find Your Path</b>, our career path app that helps people to explore their many career options and opportunities in a clear, directed fashion. We help our users answer questions like "Where can I go from here?" and "How can I make this career switch?" without overwhelming them with too many options or complexity.<br>
+    <br>
+    {% if not authenticated_user %} Want to know more about us? <a href="login"> Please Log in</a> 
+    {% else %} <a href="examples"> See the examples.  </a> 
+    {% endif %}
+    </p>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Our Team</h3>
+  </div>
+  <div class="panel-body">
+  Alvira Swalin: Product Manager <br>
+	Asmita Vikas: Data Engineer <br>
+	Nishan Madawanarachchi: Data Engineer <br>
+	Neerja Doshi: Data Scientist <br>
+	Ford Higgins: UI/UX <br>
+	Spencer Stanley: DevOps <br>
+  </div>
+</div>
+
+{% endblock %}

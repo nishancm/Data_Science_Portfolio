@@ -1,0 +1,54 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block head %}
+    {{super()}}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {packages:['wordtree']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable(
+          [ ['Phrases'],
+            ['I found a love for me'],
+            ['Darling just dive right in'],
+            ['And follow my lead'],
+            ['Well I found a girl beautiful and sweet'],
+            ['I never knew you were the someone waiting for me'],
+            ['Cause we were just kids when we fell in love'] ]
+        );
+
+        var options = {
+          wordtree: {
+            format: 'implicit',
+            word: 'I',
+            
+          },
+          backgroundColor: 'pink',
+          colors: 'white'
+        };
+
+        var chart = new google.visualization.WordTree(document.getElementById('wordtree_basic'));
+        chart.draw(data, options);
+      }
+    </script>
+{% endblock %}    
+
+{% block title %}
+Example
+{% endblock %}
+
+{% block navbar %}
+         {% include 'navbar.html' %}
+{% endblock %}
+
+{% block content %}
+    {% include 'dropdown.html' %}
+    <div class="container">
+        <br/>
+        <div id="wordtree_basic" style="width: 700px; height: 500px;"></div>
+    </div> <!-- /container -->
+{% endblock %}
+  
+

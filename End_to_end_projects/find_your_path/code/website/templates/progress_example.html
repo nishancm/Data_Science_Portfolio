@@ -1,0 +1,34 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+Example
+{% endblock %}
+
+{% block navbar %}
+    {% include 'navbar.html' %}
+{% endblock %}
+
+{% block content %}
+    {% include 'dropdown.html' %}
+    <div class="container">
+        </br>
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{ progress }}%;">
+            {{ progress }} %
+            </div>
+        </div>
+        
+        <div class="progress">
+            <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{ progress }}%">
+                {{ progress }}% Liked
+            </div>
+            <div class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{ progress - 20 }}%">
+                {{ progress - 20 }}% Meh
+            </div>
+            <div class="progress-bar progress-bar-danger progress-bar-striped active"  role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{ progress - 30 }}%">
+                {{ progress - 30 }}% Disliked
+            </div>
+        </div>
+    </div> <!-- /container -->
+{% endblock %}
