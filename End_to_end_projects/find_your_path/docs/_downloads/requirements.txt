@@ -2,7 +2,7 @@ asn1crypto==0.24.0
 bcrypt==3.1.4
 cffi==1.11.5
 click==6.7
-cryptography==2.2.2
+cryptography==3.2
 datefinder==0.6.1
 Flask==0.12.2
 idna==2.6
