@@ -7,7 +7,7 @@ datefinder==0.6.1
 Flask==0.12.2
 idna==2.6
 itsdangerous==0.24
-Jinja2==2.10
+Jinja2==2.11.3
 MarkupSafe==1.0
 numpy==1.14.2
 pandas==0.22.0
