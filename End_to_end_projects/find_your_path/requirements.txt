@@ -27,7 +27,7 @@ mongoengine==0.15.0
 nbformat==4.4.0
 numpy==1.14.2
 pandas==0.22.0
-paramiko==2.4.1
+paramiko==2.10.1
 plotly==2.5.1
 pyasn1==0.4.2
 pycparser==2.18
