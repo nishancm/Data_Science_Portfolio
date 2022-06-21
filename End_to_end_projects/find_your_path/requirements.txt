@@ -25,7 +25,7 @@ MarkupSafe==1.0
 MongoAlchemy==0.19
 mongoengine==0.15.0
 nbformat==4.4.0
-numpy==1.14.2
+numpy==1.22.0
 pandas==0.22.0
 paramiko==2.4.1
 plotly==2.5.1
